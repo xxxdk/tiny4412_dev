@@ -1,9 +1,10 @@
+#include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/init.h>
 #include <linux/platform_device.h>
-//#include <linux/fb.h>
-//#include <linux/backlight.h>
+#include <linux/fs.h>
+#include <linux/fb.h>
+#include <linux/backlight.h>
 #include <linux/err.h>
 #include <linux/pwm.h>
 #include <linux/slab.h>
@@ -18,7 +19,7 @@
 #define PWM_IOCTL_STOP      0
 #define NS_IN_1HZ           (1000000000UL)
 #define BUZZER_PWM_ID       0
-#define BUZZER_PWM_GPIO     EXYNOS4_GPD(0)
+#define BUZZER_PWM_GPIO     EXYNOS4_GPD0(0)
 // #define PWM_MAJOR           237
 
 static struct pwm_device *pwm4buzzer;
@@ -27,7 +28,7 @@ static struct semaphore lock;
 // struct pwm_buzzer_dev{
 //   struct cdev cdev;
 // };
-struct pwm_dev *pwm_devp;
+// struct pwm_buzzer_dev *pwm_devp;
 
 
 static void pwm_buzzer_set_freq(unsigned long freq)
@@ -35,13 +36,13 @@ static void pwm_buzzer_set_freq(unsigned long freq)
   int period_ns = NS_IN_1HZ / freq;
   pwm_config(pwm4buzzer, period_ns/2, period_ns);
   pwm_enable(pwm4buzzer);
-  s3c_gpio_cfgpin(BUZZER_PWM_GPIO, S3C_CPIO_SFN(2));
+  s3c_gpio_cfgpin(BUZZER_PWM_GPIO, S3C_GPIO_SFN(2));
 }
 
-static pwm_buzzer_stop(void)
+static void pwm_buzzer_stop(void)
 {
   s3c_gpio_cfgpin(BUZZER_PWM_GPIO, S3C_GPIO_OUTPUT);
-  pwm_config(pwm4buzzer, 0, NS_IN_HZ/100);
+  pwm_config(pwm4buzzer, 0, NS_IN_1HZ/100);
   pwm_disable(pwm4buzzer);
 }
 
@@ -53,7 +54,7 @@ static int pwm_buzzer_open(struct inode *inode, struct file *file)
     return -EBUSY;
 }
 
-static int pwm_buzzer_close()
+static int pwm_buzzer_close(void)
 {
   up(&lock);
   return 0;
@@ -75,18 +76,18 @@ static long pwm_buzzer_ioctl(struct file *filp, unsigned int cmd, unsigned long 
   return 0;
 }
 
-struct file_operations pwm_buzzer_fops ={
+struct file_operations pwm_buzzer_fops = {
   .owner = THIS_MODULE,
   .open = pwm_buzzer_open,
   .release = pwm_buzzer_close,
   .unlocked_ioctl = pwm_buzzer_ioctl,
-}
+};
 
-struct pwm_misc_dev{
+struct miscdevice pwm_misc_dev = {
   .minor = MISC_DYNAMIC_MINOR,
   .name = DEV_NAME,
   .fops = &pwm_buzzer_fops,
-}
+};
 
 // static dev_setup_cdev()
 // {
@@ -96,7 +97,8 @@ struct pwm_misc_dev{
 static __init int pwm_buzzer_init(void)
 {
   int ret;
-  ret = gpio_requeat(BUZZER_PWM_GPIO, DEV_NAME);
+
+  ret = gpio_request(BUZZER_PWM_GPIO, DEV_NAME);
   if(ret){
     printk(KERN_NOTICE "REQUEST GPIO %d FOR PWM FAILED\n", BUZZER_PWM_GPIO);
     return ret;
@@ -108,9 +110,9 @@ static __init int pwm_buzzer_init(void)
   pwm4buzzer = pwm_request(BUZZER_PWM_ID, DEV_NAME);
   if(IS_ERR(pwm4buzzer)){
     printk(KERN_NOTICE "REQUEST PWM %d FOR %s FAILED\n", BUZZER_PWM_ID, DEV_NAME);
-    reruen -ENODEV;
+    return -ENODEV;
   }
-  pwm_stop();
+  pwm_buzzer_stop();
 
   sema_init(&lock, 1);
   ret = misc_register(&pwm_misc_dev);

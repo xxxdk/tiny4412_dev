@@ -12,5 +12,5 @@ clean:
 	rm -rf cpbuzz
 
 #编译上层app应用程序
-id:
+bin:
 	arm-linux-gcc cpbuzz.c -o cpbuzz
