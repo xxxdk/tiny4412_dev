@@ -54,7 +54,7 @@ static int pwm_buzzer_open(struct inode *inode, struct file *file)
     return -EBUSY;
 }
 
-static int pwm_buzzer_close(void)
+static int pwm_buzzer_close(struct inode *inode, struct file *file)
 {
   up(&lock);
   return 0;
@@ -110,14 +110,17 @@ static __init int pwm_buzzer_init(void)
   pwm4buzzer = pwm_request(BUZZER_PWM_ID, DEV_NAME);
   if(IS_ERR(pwm4buzzer)){
     printk(KERN_NOTICE "REQUEST PWM %d FOR %s FAILED\n", BUZZER_PWM_ID, DEV_NAME);
-    return -ENODEV;
+    // return -ENODEV;
+    ret = PTR_ERR(pwm4buzzer);
+    printk("ERROR IS %d", ret);
+    return ret;
   }
   pwm_buzzer_stop();
 
   sema_init(&lock, 1);
   ret = misc_register(&pwm_misc_dev);
   printk(KERN_NOTICE DEV_NAME "\tinitialized\n");
-  return ret;
+  return 0;
 }
 
 static __exit void pwm_buzzer_exit(void)
