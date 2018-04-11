@@ -3,3 +3,5 @@ tiny4412 driver code，exercise
 
 自学linux驱动开发的产生的代码
 只有学习价值
+
+wait_queue尚未能运行

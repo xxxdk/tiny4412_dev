@@ -35,7 +35,7 @@ irqreturn_t handler(int num, void *data)
   return IRQ_HANDLED;
 }
 
-void input_dev_init(struct input_dev *dev)
+static void input_dev_init(struct input_dev *dev)
 {
   __set_bit(EV_SYN, dev->evbit);
   __set_bit(EV_KEY, dev->evbit);
@@ -45,13 +45,47 @@ void input_dev_init(struct input_dev *dev)
 
 struct input_dev *inpdev;
 
-int kinput_init(void)
+static  __init int kinput_init(void)
 {
   int ret;
   printk(KERN_NOTICE "KINPUT DEV INIT\n");
-  dev = input_allocate_device();
-  if(IS_ERROR_NULL(dev)){
+  inpdev = input_allocate_device();
+  if(IS_ERR_OR_NULL(inpdev)){
     ret = -ENOMEM;
     goto err_alloc;
   }
+
+  input_dev_init(inpdev);
+  ret = input_register_device(inpdev);
+  if(IS_ERR_VALUE(ret))
+    goto err_input_reg;
+
+  ret = request_irq(IRQ_EINT(26), handler, IRQF_TRIGGER_RISING |
+          IRQF_TRIGGER_FALLING, DEV_NAME, inpdev);
+  if(IS_ERR_VALUE(ret))
+    goto err_request_irq;
+
+  return 0;
+
+  err_request_irq:
+    input_unregister_device(inpdev);
+  err_input_reg:
+    input_free_device(inpdev);
+  err_alloc:
+    return ret;
 }
+
+static __exit void kinput_exit(void)
+{
+  printk(KERN_NOTICE "KINPUT DEV EXIT\n");
+  free_irq(IRQ_EINT(26), inpdev);
+  input_unregister_device(inpdev);
+  input_free_device(inpdev);
+}
+
+module_init(kinput_init);
+module_exit(kinput_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("X.D.KAI");
+MODULE_VERSION("2018.04.11");
