@@ -1,3 +1,10 @@
+/*方法一：
+make menuconfig
+System Type --> BUZZER device suppor 关闭就可以insmod本驱动
+方法二：直接将本代码修改至
+/home/project/Downloads/linux-3.5/drivers/char/tiny4412_pwm.c
+这是个愚蠢的方法，无意义
+*/
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>

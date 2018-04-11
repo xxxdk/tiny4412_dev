@@ -1,3 +1,5 @@
+/*ctrl-c atexit(close_buzzer);
+*/
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
