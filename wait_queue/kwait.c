@@ -1,3 +1,5 @@
+/*linux 等待队列 测试代码
+*/
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/fs.h>
