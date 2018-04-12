@@ -11,18 +11,30 @@
 #include <linux/gpio.h>
 #include <mach/gpio.h>
 #include <plat/gpio-cfg.h>
+#include <asm/io.h>
+#include <asm/uaccess.h>
+#include <asm/irq.h>
 
 #define DEV_NAME  "kmisc"
+#define GPD0CON   0x114000A0
+#define GPD0CON_DAT 0x114000A4
+
+volatile unsigned long *bell_config = NULL;
+volatile unsigned long *bell_dat = NULL;
 
 int kmisc_dev_open(struct inode *inode, struct file *file)
 {
   printk(KERN_NOTICE "KMISC DEV OPEN\n");
+  *bell_config &= ~(0xf);
+  *bell_config |= 0x1;
+  *bell_dat |= 0x1;
   return 0;
 }
 
 int kmisc_dev_close(struct inode *inode, struct file *file)
 {
   printk(KERN_NOTICE "KMISC DEV CLOSE\n");
+  *bell_dat &= ~(0x1);
   return 0;
 }
 
@@ -41,6 +53,9 @@ struct miscdevice kmisc_dev = {
 static __init int kmisc_dev_init(void)
 {
   int ret, ret_err;
+  bell_config = (volatile unsigned long *)ioremap(GPD0CON, 4);
+  bell_dat = (volatile unsigned long *)ioremap(GPD0CON_DAT, 4);
+
   ret = misc_register(&kmisc_dev);
   if(ret != 0){
     ret_err = ret;
@@ -48,6 +63,7 @@ static __init int kmisc_dev_init(void)
     goto fail;
   }
   printk(KERN_NOTICE "KMISC DEV INIT SUCCESS\n");
+  kmisc_dev_open(NULL, NULL);
   return ret;
 fail:
   return ret_err;
@@ -56,6 +72,8 @@ fail:
 static __exit void kmisc_dev_exit(void)
 {
   misc_deregister(&kmisc_dev);
+  iounmap(bell_config);
+  iounmap(bell_dat);
 }
 
 module_init(kmisc_dev_init);
