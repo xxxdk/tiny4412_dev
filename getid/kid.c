@@ -105,6 +105,7 @@ static __init int id_init(void)
 static __exit void id_exit(void)
 {
   printk(KERN_NOTICE "ID EXIT\n");
+  cdev_del(&id_devp->cdev);
   unregister_chrdev_region(id_major, 1);
   iounmap(virtul);
 }
