@@ -124,8 +124,8 @@ static __exit void bell_exit(void)
 {
   printk(KERN_NOTICE "BELL EXIT\n");
   cdev_del(&bell_devp->cdev);
-  kfree(bell_devp);
   unregister_chrdev_region(MKDEV(bell_major,0),1);
+  kfree(bell_devp);
   iounmap(bell_config);
   iounmap(bell_dat);
 }

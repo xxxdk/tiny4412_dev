@@ -153,8 +153,8 @@ static __exit void test_exit(void)
 {
   printk("led_exit\n");
   cdev_del(&led_devp->cdev);
-  kfree(led_devp);
   unregister_chrdev_region(MKDEV(led_major,0),1);
+  kfree(led_devp);
   iounmap(led_config);
   iounmap(led_dat);
 }

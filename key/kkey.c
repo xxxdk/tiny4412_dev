@@ -127,8 +127,8 @@ static __exit void key_exit(void)
 {
   printk(KERN_NOTICE "KEY EXIT\n");
   cdev_del(&key_devp->cdev);
-  kfree(key_devp);
   unregister_chrdev_region(MKDEV(key_major, 0), 1);
+  kfree(key_devp);
   iounmap(key_config);
   iounmap(key_dat);
 }
