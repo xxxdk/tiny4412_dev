@@ -23,7 +23,7 @@ struct tasklet_struct task_t;
 static void task_func(unsigned long data)
 {
   if(in_interrupt())
-    printk("%s in interrupt handle\n", __FUNCTION__);
+    printk("data:%ld \n the %s in interrupt handle\n", data, __FUNCTION__);
 }
 
 static irqreturn_t irq_func(int irq, void *dev_id)
