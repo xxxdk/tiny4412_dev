@@ -1,11 +1,12 @@
 #将你所写的驱动程序编译成模块形式
-obj-m	+= kmisc.o
+# obj-m	+= kmisc.o
+obj-m	+= simple_misc.o
 #你需要的内核
 KERNEL := /home/project/Downloads/linux-3.5
 #模块编译
 all:
 	make -C $(KERNEL) M=`pwd` modules
-	# arm-linux-gcc cmisc.c -o cmisc
+# arm-linux-gcc cmisc.c -o cmisc
 #模块清除
 clean:
 	make -C $(KERNEL) M=`pwd` clean
