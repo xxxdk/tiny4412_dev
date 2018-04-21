@@ -1,7 +1,7 @@
 #将你所写的驱动程序编译成模块形式
 obj-m	+= kbuzzer.o
 #你需要的内核
-KERNEL := /home/project/Downloads/linux-3.5
+KERNEL := /home/sni/workSpace/linux-3.5
 #模块编译
 #模块清除
 clean:
