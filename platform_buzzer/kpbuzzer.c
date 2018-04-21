@@ -1,3 +1,13 @@
+/*需要在../arch/arm/mach-exynos/mach-tiny4412.c 中加入
+static struct platform_device kpbuzzer_device = {
+				.name						= "kpbuzzer",
+				.id							= -1,
+};
+
+和在static struct platform_device *smdk4x12_devices[] __initdata中加入
+&kpbuzzer_device,
+*/
+
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
