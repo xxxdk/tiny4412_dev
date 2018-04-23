@@ -1,6 +1,6 @@
 #将你所写的驱动程序编译成模块形式
 obj-m	+= e2p_drv.o
-obj-m += e2p_dev.o
+# obj-m += e2p_dev.o
 #你需要的内核
 # KERNEL := /home/sni/workSpace/linux-3.5
 KERNEL := /home/project/Downloads/linux-3.5

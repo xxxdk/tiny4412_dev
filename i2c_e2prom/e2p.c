@@ -26,12 +26,15 @@ int main(int argc, char **argv)
     printf("open fail\n");
     return -1;
   }
+  printf("open success\n");
   if(strcmp(argv[1], "r") == 0){
+    printf("r\n");
     buf[0] = strtoul(argv[2], NULL, 0);
     read(fd, buf, 1);
     printf("data: %c, %d, %#02x\n", buf[0], buf[0], buf[0]);
   }
   else if((strcmp(argv[1], "w") == 0) && (argc == 4)){
+    printf("w\n");
     buf[0] == strtoul(argv[2], NULL, 0);
     buf[1] == strtoul(argv[3], NULL, 0);
     if(write(fd, buf, 2) != 2)
