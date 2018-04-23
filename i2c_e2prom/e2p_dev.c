@@ -7,8 +7,8 @@
 #include <linux/slab.h>
 
 static struct i2c_client *e2p_client;
-static struct i2c_board_info e2p_info={
-  I2C_BOARD_INFO("at24c08", 0x50);
+static struct i2c_board_info e2p_info = {
+  I2C_BOARD_INFO("at24c08", 0x50),
 };
 
 static int e2p_dev_init(void)
